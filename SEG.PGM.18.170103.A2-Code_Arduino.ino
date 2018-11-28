@@ -29,14 +29,13 @@ float pitch; //roll, pitch, heading;   //pitch=inclinaison
 //SimpleTimer timer_asserv;
 
 // Driver moteur
-#define ena 3  //puissance moteur1
-#define in1 4 //sens moteur1
-#define in2 5  //sens moteur1
-#define enb 9   //puissance moteur2
-#define in3 10   //sens moteur2
-#define in4 11    // sens moteur2
+#define ena 5  //puissance moteur1
+#define dir1 3 //sens moteur1
+#define enb 6   //puissance moteur2
+#define dir2 4   //sens moteur2
 
 //ASSERVISSMENT
+const int relayStatus = 2; // relay status qui permet d'envoyer ou pas la commande 
 float kp = 50; //30; // coef proportionnel
 float ki = 0.001;//0.01;  //coef intégrateur
 float kd = 20;//5;   // coef dérivateur
@@ -107,11 +106,11 @@ void setup() {
 
   //CONFIG DRIVER
   pinMode(ena, OUTPUT);
-  pinMode(in1, OUTPUT);
-  pinMode(in2, OUTPUT);
+  pinMode(dir1, OUTPUT);
   pinMode(enb, OUTPUT);
-  pinMode(in3, OUTPUT);
-  pinMode(in4, OUTPUT);
+  pinMode(dir2, OUTPUT);
+  pinMode(relayStatus, INPUT); 
+
   moteur_off();
   pinMode(13, OUTPUT);
 
@@ -131,9 +130,6 @@ void setup() {
   //timer_asserv.setInterval(1000 / f_ech, asservissement); //Timer d'asservissement
   const  int microSecondsTimer = (1.0/f_ech)*1000000; 
   CurieTimerOne.start(microSecondsTimer, &asservissement);
-
-  
-
 }
 
 //=============================================================================

@@ -9,12 +9,10 @@
 
 void moteur1(unsigned int pwr, boolean sens) {
   if (sens) {
-    digitalWrite(in1, HIGH);
-    digitalWrite(in2, LOW);
+    digitalWrite(dir1, HIGH);
   }
   else {
-    digitalWrite(in1, LOW);
-    digitalWrite(in2, HIGH);
+    digitalWrite(dir1, LOW);
   }
 
   analogWrite(ena, pwr);
@@ -22,12 +20,10 @@ void moteur1(unsigned int pwr, boolean sens) {
 
 void moteur2(unsigned int pwr, boolean sens) {
   if (!sens) {
-    digitalWrite(in3, HIGH);
-    digitalWrite(in4, LOW);
+    digitalWrite(dir2, HIGH);
   }
   else {
-    digitalWrite(in3, LOW);
-    digitalWrite(in4, HIGH);
+    digitalWrite(dir2, LOW);
   }
 
   analogWrite(enb, pwr);

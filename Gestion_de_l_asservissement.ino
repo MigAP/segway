@@ -101,7 +101,11 @@ void asservissement() {
 
   bleData[4] = '/'; 
   sensorCharacteristic.setValue(bleData,dataAmount); 
-  PID_ANGLE(); // Appel de la fonction d'asservissement
+
+  if(digitalRead(relayStatus)){
+    PID_ANGLE(); // Appel de la fonction d'asservissement
+  }
+  
 }
 
 
