@@ -27,12 +27,21 @@ float convertRawGyro(int gRaw) {
 //Mise en place du correcteur PID
 
 void PID_ANGLE() {
-  err = consigne - pitch; // calcul de l'erreur sur l'angle d'équilibre    pitch=angle d'inclinaison mesuré     
-  delta_err = err - err_precedente; // calcul de la dérivée de l'erreur sur l'angle d'équilibre
+  err = consigne - pitch; // calcul de l'erreur sur l'angle d'équilibre    pitch=angle d'inclinaison mesuré
+  float err_filtree = err_precedente_filtree + coefficient_filtre * (err - err_precedente_filtree); //filtrage passe-bas premier ordre (moyenne glissante exponentielle) 
+  //delta_err = err - err_precedente; // calcul de la dérivée de l'erreur sur l'angle d'équilibre
+  /*Filtrage avant dérivation car la dérivation amplifie fortement le bruit*/
+  delta_err = err_filtree - err_precedente_filtree; // calcul de la dérivée de l'erreur sur l'angle d'équilibre
   somme_err = somme_err + err;  //Calcul de l'integrale de l'erreur
   err_precedente = err;
 
-  float cmd = kp * err + ki * somme_err + kd * delta_err - k_gy * gy; // calcul du corrceteur PID    //k-gy est un coef   gy est la vitesse angulaire d'inclinaison
+  float cmdP = kp * err;
+  float cmdI = ki * somme_err;
+  float cmdD = kd * delta_err;
+  float cmdMystere = - k_gy * gy;
+  float cmd = cmdP + cmdI + cmdD + cmdMystere ; // calcul du correcteur PID    //k-gy est un coef   gy est la vitesse angulaire d'inclinaison
+
+  somme_err = (cmd - cmdP - cmdD - cmdMystere) / ki; //anti-windup : La somme des erreurs est recalculée de manière à ne pas faire saturer la commande
 
   cmd_m1 = cmd + k_gz * gz + consigne_roll;     // Elaboration de la commande de la roue gauche       //consign-roll permet de tourner et permet une vitesse de roue différentielle. consigne_roll sera déterminé grâce au joystick.
   cmd_m2 = cmd - k_gz * gz - consigne_roll; // Elaboration de la commande de la roue droite      //k-gz est un coef      gz est la vitesse angulaire relative au changement de direction du seg

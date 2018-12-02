@@ -35,6 +35,7 @@ int microSecondsTimer;
 #define enb 6   //puissance moteur2
 #define dir2 4   //sens moteur2
 #define buz 9 
+#define joystick  1
 
 //ASSERVISSMENT
 // const int relayStatus = 7; // relay status qui permet d'envoyer ou pas la commande 
@@ -42,7 +43,9 @@ float kp = 35; //30; // coef proportionnel
 float ki = 0.001;//0.01;  //coef intégrateur
 float kd = 20;//5;   // coef dérivateur
 float k_gy = 0; //0.4;  //coef de correction relatif à la vitesse angulaire d'inclinaison : à supprimer ?
-float k_gz = 0;    //coef relatif à la différence de vitesse des moteurs --> pour tourner
+float k_gz = 50;    //coef relatif à la différence de vitesse des moteurs --> pour tourner
+
+float coefficient_filtre = 0.1; //coefficient entre 0 et 1 : 1 = pas de filtrage , valeur proche de 0 : temps de réponse élevé
 
 #define P_MAX 255 //limitation de la puissance Max (max etant 255)
 #define pitch_max 20//Angle max autorisé; Au dela, le robot est consideré comme en chute
@@ -54,6 +57,7 @@ float consigne_roll = 0;   //pour pouvoir tourner
 float somme_err = 0;
 float delta_err = 0;
 float err_precedente = 0;
+float err_precedente_filtree = 0;
 float cmd_m1 = 0;
 float cmd_m2 = 0;
 
@@ -80,12 +84,14 @@ char asciiBuffer[9]; // buffer to convert float numbers to ASCII code
 
 //Buffer to hold "dataAmount" bytes
 unsigned char  bleData[ dataAmount ];
-unsigned char pidData[3] {kp,ki,kd}; 
+unsigned char pidData[3] {(unsigned char)kp,(unsigned char)ki,(unsigned char)kd}; 
 
 // create a custom bluetooth service that will have two characteristic 
 BLEService customService("19B10010-E8F2-537E-4F6C-D104768A1216");
 BLECharacteristic sensorCharacteristic("19B10011-E8F2-537E-4F6C-D104768A1214", BLERead | BLENotify,dataAmount);
 BLECharacteristic pidCharacteristic("19B10012-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite,3);
+
+int joystickValue = 0;
 
 //=============================================================================
 //                        SETUP
@@ -112,6 +118,7 @@ void setup() {
   pinMode(enb, OUTPUT);
   pinMode(dir2, OUTPUT);
   pinMode(buz, OUTPUT); 
+  pinMode(joystick,INPUT);
 
   moteur_off();
   pinMode(13, OUTPUT);
@@ -160,6 +167,8 @@ void loop() {
       }  
     }
   }
+  joystickValue = analogRead(joystick);
+  consigne_roll = (joystickValue - 512)/512; //[0,1023] -> [-1,1]
   delay(10); 
 }
 
