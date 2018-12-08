@@ -33,6 +33,7 @@ void PID_ANGLE() {
   /*Filtrage avant dérivation car la dérivation amplifie fortement le bruit*/
   delta_err = err_filtree - err_precedente_filtree; // calcul de la dérivée de l'erreur sur l'angle d'équilibre
   somme_err = somme_err + err;  //Calcul de l'integrale de l'erreur
+  err_precedente_filtree = err_filtree;
   err_precedente = err;
 
   float cmdP = kp * err;
@@ -42,6 +43,13 @@ void PID_ANGLE() {
   float cmd = cmdP + cmdI + cmdD + cmdMystere ; // calcul du correcteur PID    //k-gy est un coef   gy est la vitesse angulaire d'inclinaison
 
   somme_err = (cmd - cmdP - cmdD - cmdMystere) / ki; //anti-windup : La somme des erreurs est recalculée de manière à ne pas faire saturer la commande
+
+  float cmdSansI = cmdP + cmdD + cmdMystere;
+  cdmSansI = constrain(cdmSansI, -P_MAX, P_MAX);
+  float cmdSat = constrain(cmd, -P_MAX, P_MAX);
+
+  if(ki != 0)
+    somme_err = (cmdSat - cdmSansI) / ki; //anti-windup : La somme des erreurs est recalculée de manière à ne pas faire saturer la commande
 
   cmd_m1 = cmd + k_gz * gz + consigne_roll;     // Elaboration de la commande de la roue gauche       //consign-roll permet de tourner et permet une vitesse de roue différentielle. consigne_roll sera déterminé grâce au joystick.
   cmd_m2 = cmd - k_gz * gz - consigne_roll; // Elaboration de la commande de la roue droite      //k-gz est un coef      gz est la vitesse angulaire relative au changement de direction du seg
