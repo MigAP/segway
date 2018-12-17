@@ -35,6 +35,7 @@ int microSecondsTimer;
 #define enb 6   //puissance moteur2
 #define dir2 4   //sens moteur2
 #define buz 9 
+#define joystick 11 
 
 //ASSERVISSMENT
 // const int relayStatus = 7; // relay status qui permet d'envoyer ou pas la commande 
@@ -42,7 +43,7 @@ float kp = 35; //30; // coef proportionnel
 float ki = 0.001;//0.01;  //coef intégrateur
 float kd = 20;//5;   // coef dérivateur
 float k_gy = 0; //0.4;  //coef de correction relatif à la vitesse angulaire d'inclinaison : à supprimer ?
-float k_gz = 0;    //coef relatif à la différence de vitesse des moteurs --> pour tourner
+float k_gz = 50;    //coef relatif à la différence de vitesse des moteurs --> pour tourner
 
 #define P_MAX 255 //limitation de la puissance Max (max etant 255)
 #define pitch_max 20//Angle max autorisé; Au dela, le robot est consideré comme en chute
@@ -160,6 +161,8 @@ void loop() {
       }  
     }
   }
+  joystickValue = analogRead(joystick);
+  consigne_roll = (joystickValue - 512)/512; //[0,1023] -> [-1,1]
   delay(10); 
 }
 

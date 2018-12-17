@@ -34,8 +34,8 @@ void PID_ANGLE() {
 
   float cmd = kp * err + ki * somme_err + kd * delta_err - k_gy * gy; // calcul du corrceteur PID    //k-gy est un coef   gy est la vitesse angulaire d'inclinaison
 
-  cmd_m1 = cmd + k_gz * gz + consigne_roll;     // Elaboration de la commande de la roue gauche       //consign-roll permet de tourner et permet une vitesse de roue différentielle. consigne_roll sera déterminé grâce au joystick.
-  cmd_m2 = cmd - k_gz * gz - consigne_roll; // Elaboration de la commande de la roue droite      //k-gz est un coef      gz est la vitesse angulaire relative au changement de direction du seg
+  cmd_m1 = cmd + k_gz * consigne_roll;     // Elaboration de la commande de la roue gauche       //consign-roll permet de tourner et permet une vitesse de roue différentielle. consigne_roll sera déterminé grâce au joystick.
+  cmd_m2 = cmd - k_gz * consigne_roll; // Elaboration de la commande de la roue droite      //k-gz est un coef      gz est la vitesse angulaire relative au changement de direction du seg
 
   cmd_m1 = constrain(cmd_m1, -P_MAX, P_MAX);    //Saturation de la commande
   cmd_m2 = constrain(cmd_m2, -P_MAX, P_MAX);  //Saturation de la commande
