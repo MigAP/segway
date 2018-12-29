@@ -1,4 +1,4 @@
-
+  
 // Eviter des erreurs de compilation 
 namespace std
 {
@@ -35,7 +35,7 @@ int microSecondsTimer;
 #define enb 6   //puissance moteur2
 #define dir2 4   //sens moteur2
 #define buz 9 
-#define joystick 11 
+#define joystick A1 // joystick
 
 //ASSERVISSMENT
 // const int relayStatus = 7; // relay status qui permet d'envoyer ou pas la commande 
@@ -51,6 +51,7 @@ float k_gz = 50;    //coef relatif à la différence de vitesse des moteurs --> 
 float err = 0;
 float consigne = -3.8;   
 float consigne_roll = 0;   //pour pouvoir tourner
+int joystickValue = 0; 
 
 float somme_err = 0;
 float delta_err = 0;
@@ -113,7 +114,7 @@ void setup() {
   pinMode(enb, OUTPUT);
   pinMode(dir2, OUTPUT);
   pinMode(buz, OUTPUT); 
-
+  pinMode(joystick,INPUT); 
   moteur_off();
   pinMode(13, OUTPUT);
 
@@ -144,27 +145,25 @@ void loop() {
  
   BLEDevice central = BLE.central(); // BLE central connected to peripheral 
 
-  if(central){
+  // if(central){
 
-    while (central.connected()){
+  //   while (central.connected()){
 
-      //Programme principale
-      //timer_asserv.run();
+  //     //Programme principale
+  //     //timer_asserv.run();
       
 
-      // Si l'utilisateur modifie la valeur du PID on met a jour les valeur des correcteurs 
-      if(pidCharacteristic.written()){ 
-        kp = pidCharacteristic.value()[0]; 
-        ki = pidCharacteristic.value()[1]/100.0; 
-        kd = pidCharacteristic.value()[2]; 
-        //Serial.println("kp "+String(kp)+ "ki "+String(ki)+ "kd "+String(kd)); 
-      }  
-    }
-  }
+  //     // Si l'utilisateur modifie la valeur du PID on met a jour les valeur des correcteurs 
+  //     if(pidCharacteristic.written()){ 
+  //       kp = pidCharacteristic.value()[0]; 
+  //       ki = pidCharacteristic.value()[1]/100.0; 
+  //       kd = pidCharacteristic.value()[2]; 
+  //       //Serial.println("kp "+String(kp)+ "ki "+String(ki)+ "kd "+String(kd)); 
+  //     }  
+  //   }
+  // }
   joystickValue = analogRead(joystick);
-  consigne_roll = (joystickValue - 512)/512; //[0,1023] -> [-1,1]
-  delay(10); 
+  consigne_roll = (joystickValue - 792.0)/792.0; //[0,1023] -> [-1,1] 
+  if(consigne_roll>0)
+    consigne_roll = consigne_roll*3.33; 
 }
-
-
-
